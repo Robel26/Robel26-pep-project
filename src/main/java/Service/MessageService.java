@@ -8,6 +8,17 @@ import Model.Message;
 
 public class MessageService {
 
+
+    public MessageDAO messageDAO;
+
+    public MessageService() {
+        messageDAO = new MessageDAO();
+    }
+
+    public MessageService(MessageDAO messageDAO) {
+        this.messageDAO = messageDAO;
+    }
+
     /**
      * get message by id
      * 
@@ -34,11 +45,6 @@ public class MessageService {
 
         return MessageDAO.updatedMessage(message);
     }
-
-    // if (existingMessageText == null) {
-    // return false;
-    // }
-    // return true;
 
     /**
      * get all message
@@ -85,8 +91,17 @@ public class MessageService {
         return MessageDAO.getAllMessagesByUser(userId);
     }
 
-    ////////////////////////////////////////////////////////////////////
+    /**
+     *  create messages
+     * @param message
+     * @return
+     */
     public static Message createMessage(Message message) {
+        if (message == null || message.getMessage_text() == null ||
+        message.getMessage_text().trim().isEmpty()
+        || message.getMessage_text().length() >= 255) {
+        return null;
+        }
         return MessageDAO.createMessage(message);
     }
 

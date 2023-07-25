@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import Model.Account;
 import Util.ConnectionUtil;
@@ -40,5 +41,33 @@ public class AccountDAO {
 
         return null;
     }
+
+    /**
+    * register a user
+    * @param account
+    * @return
+    */
+    public static Account registerUserCreateAccount(Account account) {
+    // TODO Auto-generated method stub
+    Connection connection = ConnectionUtil.getConnection();
+    try {
+        String sql = "INSERT INTO account (username , password) VALUES (?,?)";
+        PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        statement.setString(1, account.getUsername());
+        statement.setString(2, account.getPassword());
+        statement.executeUpdate();
+
+        ResultSet rs = statement.getGeneratedKeys();
+        if (rs.next()) {
+            int id = rs.getInt(1);
+            account.setAccount_id(id);
+            return account;
+        }
+
+    } catch (SQLException e) {
+        // TODO: handle exception
+    }
+    return null;
+}
 
 }

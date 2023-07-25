@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -152,19 +153,27 @@ public class MessageDAO {
         }
         return messages;
     }
-
+    /**
+    * create message part
+    * @param message
+    * @return
+    */
     public static Message createMessage(Message message) {
         Connection connection = ConnectionUtil.getConnection();
         try {
-            String sql = "INSERT INTO message( message_text, posted_by, time_posted_epoch) VALUES(?,?,?,?)";
-            PreparedStatement prepareStatement = connection.prepareStatement(sql);
-            // prepareStatement.setInt(1, message.getMessage_id());
-            prepareStatement.setString(2, message.getMessage_text());
-            prepareStatement.setInt(3, message.getPosted_by());
-            prepareStatement.setLong(4, message.getTime_posted_epoch());
+            String sql = "INSERT INTO message( message_text, posted_by, time_posted_epoch) VALUES(?,?,?)";
+            PreparedStatement prepareStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            
+            
+            prepareStatement.setString(1, message.getMessage_text());
+            prepareStatement.setInt(2, message.getPosted_by());
+            prepareStatement.setLong(3, message.getTime_posted_epoch());
 
-            int rowsAffected = prepareStatement.executeUpdate();
-            if (rowsAffected > 0) {
+            prepareStatement.executeUpdate();
+            ResultSet rs = prepareStatement.getGeneratedKeys();
+            if (rs.next()) {
+                int id = rs.getInt(1);
+                message.setMessage_id(id);
                 return message;
             }
 

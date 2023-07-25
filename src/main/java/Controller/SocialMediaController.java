@@ -72,19 +72,9 @@ public class SocialMediaController {
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
 
-        if (account.getUsername() != null && !account.getUsername().isEmpty()) {
-            if (account.getPassword() != null && account.getPassword().length() >= 4) {
-                Account registeredAccount = new Account(2, account.getUsername(), account.getPassword());
-
-                // Convert the registered Account object to JSON
-                String registeredAccountJson = mapper.writeValueAsString(registeredAccount);
-
-                ctx.result(registeredAccountJson);
-                ctx.status(200);
-
-            } else {
-                ctx.status(400);
-            }
+        Account registeredAccount = accountService.userRegister(account);
+        if (registeredAccount != null) {
+            ctx.json(registeredAccount).status(200);
         } else {
             ctx.status(400);
         }
@@ -128,8 +118,7 @@ public class SocialMediaController {
             return;
         }
         String newMessageText = updatedMessage.getMessage_text();
-
-        // Update the message
+        
         existingMessageText.setMessage_text(newMessageText);
         // Now update the message in the database
         boolean isUpdateSuccessful = messageService.updateMessage(existingMessageText);
@@ -137,8 +126,8 @@ public class SocialMediaController {
             ctx.status(400);
             return;
         }
-        // If everything is successful, respond with the updated message and status 200
-        ctx.json(existingMessageText); // Return the updated message in the response body
+        
+        ctx.json(existingMessageText); 
         ctx.status(200); // Success
     }
 
@@ -168,7 +157,7 @@ public class SocialMediaController {
         ObjectMapper mapper = new ObjectMapper();
         Message message = mapper.readValue(ctx.body(), Message.class);
         Message createMessage = MessageService.createMessage(message);
-        if (createMessage != null && createMessage.getMessage_text().length() > 255) {
+        if (createMessage != null) {
             ctx.status(200).json(createMessage);
         } else {
             ctx.status(400);
