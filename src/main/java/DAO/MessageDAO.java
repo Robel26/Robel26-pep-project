@@ -154,7 +154,7 @@ public class MessageDAO {
         return messages;
     }
     /**
-    * create message part
+    * create message 
     * @param message
     * @return
     */
